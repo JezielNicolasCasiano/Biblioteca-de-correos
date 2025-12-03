@@ -1,4 +1,4 @@
-package com.biblioteca.bibliotecadecorreos;
+package com.library.emaillibrary;
 
 import javafx.application.Application;
 

@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="407.0" prefWidth="595.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+<TabPane tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.library.emaillibrary.controller.SarchEmailMenuController">
   <tabs>
     <Tab text="Untitled Tab 1">
       <content>
@@ -19,10 +19,16 @@
                             <TableColumn prefWidth="76.19998168945312" text="C2" />
                           </columns>
                         </TableView>
-                        <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="93.0" prefWidth="574.0" text="Label" />
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Button alignment="CENTER" mnemonicParsing="false" onAction="#onVerifyState" prefHeight="60.0" prefWidth="193.0" text="Button" />
+                              <Label fx:id="stateLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="60.0" prefWidth="318.0" text="Label" />
+                           </children>
+                        </HBox>
                      </children>
                   </VBox>
-               </children></AnchorPane>
+               </children>
+            </AnchorPane>
       </content>
     </Tab>
     <Tab text="Untitled Tab 2">
