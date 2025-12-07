@@ -7,10 +7,7 @@ import com.library.emaillibrary.model.PersonaModelo;
 import com.library.emaillibrary.model.SucursalModelo;
 import com.library.emaillibrary.util.DataBaseConnection;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Date;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -126,6 +123,16 @@ public class CorreoDAOImp implements CorreoDAO {
         return lista;
     }
 
+    @Override
+    public void eliminar(int idCorreo) throws Exception {
+        String sql = "DELETE FROM Correo WHERE id_correo = ?";
+        try (Connection conn = DataBaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idCorreo);
+            ps.executeUpdate();
+        }
+    }
+
     private CorreoModelo mapResultSetToCorreo(ResultSet rs) throws Exception {
 
         SucursalModelo sucursal = new SucursalModelo();
@@ -153,4 +160,117 @@ public class CorreoDAOImp implements CorreoDAO {
                 rs.getString("dominio")
         );
     }
+    @Override
+    public void insertar(CorreoModelo nuevoCorreo) throws Exception {
+        String sqlPersona = "INSERT INTO Persona (id_departamento, id_sucursal, nombre, apellido_paterno, apellido_materno, fecha_de_nacimiento) VALUES (?, ?, ?, ?, ?, ?)";
+        String sqlCorreo = "INSERT INTO Correo (id_persona, parte_local, dominio) VALUES (?, ?, ?)";
+
+        Connection conn = null;
+        PreparedStatement psPersona = null;
+        PreparedStatement psCorreo = null;
+        ResultSet rsKeys = null;
+
+        try {
+            conn = DataBaseConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            psPersona = conn.prepareStatement(sqlPersona, Statement.RETURN_GENERATED_KEYS);
+
+            psPersona.setInt(1, nuevoCorreo.getPersona().getDepartamento().getIdDepartamento());
+            psPersona.setInt(2, nuevoCorreo.getPersona().getSucursal().getIdSucursal());
+            psPersona.setString(3, nuevoCorreo.getPersona().getNombre());
+            psPersona.setString(4, nuevoCorreo.getPersona().getApellidoPaterno());
+            psPersona.setString(5, nuevoCorreo.getPersona().getApellidoMaterno());
+            psPersona.setDate(6, new java.sql.Date(nuevoCorreo.getPersona().getFechaDeNacimiento().getTime()));
+
+            int filasAfectadas = psPersona.executeUpdate();
+
+            if (filasAfectadas == 0) {
+                throw new Exception("No se pudo insertar la persona, ninguna fila afectada.");
+            }
+
+            rsKeys = psPersona.getGeneratedKeys();
+            int idPersonaGenerado = 0;
+            if (rsKeys.next()) {
+                idPersonaGenerado = rsKeys.getInt(1);
+            } else {
+                throw new Exception("No se pudo obtener el ID de la persona insertada.");
+            }
+
+            psCorreo = conn.prepareStatement(sqlCorreo);
+            psCorreo.setInt(1, idPersonaGenerado);
+            psCorreo.setString(2, nuevoCorreo.getParteLocal());
+            psCorreo.setString(3, nuevoCorreo.getDominio());
+
+            psCorreo.executeUpdate();
+            conn.commit();
+
+        } catch (Exception e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+            throw e;
+
+        } finally {
+            if (rsKeys != null) rsKeys.close();
+            if (psPersona != null) psPersona.close();
+            if (psCorreo != null) psCorreo.close();
+            if (conn != null) {
+                conn.setAutoCommit(true);
+                conn.close();
+            }
+        }
+    }
+
+    @Override
+    public void actualizar(CorreoModelo correo) throws Exception {
+        String sqlPersona = "UPDATE Persona SET id_departamento=?, id_sucursal=?, nombre=?, apellido_paterno=?, apellido_materno=?, fecha_de_nacimiento=? WHERE id_persona=?";
+        String sqlCorreo = "UPDATE Correo SET parte_local=?, dominio=? WHERE id_correo=?";
+
+        Connection conn = null;
+        PreparedStatement psPersona = null;
+        PreparedStatement psCorreo = null;
+
+        try {
+            conn = DataBaseConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            psPersona = conn.prepareStatement(sqlPersona);
+            psPersona.setInt(1, correo.getPersona().getDepartamento().getIdDepartamento());
+            psPersona.setInt(2, correo.getPersona().getSucursal().getIdSucursal());
+            psPersona.setString(3, correo.getPersona().getNombre());
+            psPersona.setString(4, correo.getPersona().getApellidoPaterno());
+            psPersona.setString(5, correo.getPersona().getApellidoMaterno());
+            psPersona.setDate(6, new java.sql.Date(correo.getPersona().getFechaDeNacimiento().getTime()));
+            psPersona.setInt(7, correo.getPersona().getIdPersona());
+            psPersona.executeUpdate();
+
+            psCorreo = conn.prepareStatement(sqlCorreo);
+            psCorreo.setString(1, correo.getParteLocal());
+            psCorreo.setString(2, correo.getDominio());
+            psCorreo.setInt(3, correo.getIdCorreo());
+            psCorreo.executeUpdate();
+
+            conn.commit();
+
+        } catch (Exception e) {
+            if (conn != null) {
+                try { conn.rollback(); } catch (Exception ex) { ex.printStackTrace(); }
+            }
+            throw e;
+        } finally {
+            if (psPersona != null) psPersona.close();
+            if (psCorreo != null) psCorreo.close();
+            if (conn != null) {
+                conn.setAutoCommit(true);
+                conn.close();
+            }
+        }
+    }
+
+
 }

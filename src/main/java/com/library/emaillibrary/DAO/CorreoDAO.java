@@ -6,14 +6,19 @@ import java.util.List;
 
 public interface CorreoDAO {
 
-    // Búsqueda compleja (Filtros)
     List<CorreoModelo> listarCorreos(String nombre, String aPaterno, String aMaterno,
                                      Integer idDepartamento, Integer idSucursal,
                                      String correoBusqueda, LocalDate fechaNac) throws Exception;
 
-    // Búsqueda directa (Listar todos / Default)
     List<CorreoModelo> listarTodos() throws Exception;
 
-    // Búsqueda por ID (Para edición/detalle)
     CorreoModelo obtenerPorId(int idCorreo) throws Exception;
+
+    void eliminar(int idCorreo) throws Exception;
+
+    void insertar(CorreoModelo nuevoCorreo) throws Exception;
+
+    void actualizar(CorreoModelo correo) throws Exception;
+
+
 }

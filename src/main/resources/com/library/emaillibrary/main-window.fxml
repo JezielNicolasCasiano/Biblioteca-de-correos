@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="526.0" prefWidth="542.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="526.0" prefWidth="542.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.library.emaillibrary.controller.MainWindowController">
    <top>
       <Label prefHeight="86.0" prefWidth="378.0" text="Directorio de correos" BorderPane.alignment="CENTER">
          <font>
@@ -13,14 +20,14 @@
       </Label>
    </top>
    <center>
-      <TableView prefHeight="411.0" prefWidth="438.0" BorderPane.alignment="CENTER">
+      <TableView fx:id="tablaCorreos" prefHeight="411.0" prefWidth="438.0" BorderPane.alignment="CENTER">
         <columns>
-          <TableColumn prefWidth="75.0" text="Nombre" />
-          <TableColumn prefWidth="75.0" text="Apellido Materno" />
-            <TableColumn prefWidth="75.0" text="Apellido Paterno" />
-            <TableColumn prefWidth="110.20001220703125" text="Correo" />
-            <TableColumn prefWidth="77.79998779296875" text="Departamento" />
-            <TableColumn prefWidth="74.20001220703125" text="Sucursal" />
+          <TableColumn fx:id="colNombre" prefWidth="75.0" text="Nombre" />
+          <TableColumn fx:id="colMaterno" prefWidth="75.0" text="Apellido Materno" />
+            <TableColumn fx:id="colPaterno" prefWidth="75.0" text="Apellido Paterno" />
+            <TableColumn fx:id="colCorreo" prefWidth="110.20001220703125" text="Correo" />
+            <TableColumn fx:id="colDepartamento" prefWidth="77.79998779296875" text="Departamento" />
+            <TableColumn fx:id="colSucursal" prefWidth="74.20001220703125" text="Sucursal" />
         </columns>
       </TableView>
    </center>
