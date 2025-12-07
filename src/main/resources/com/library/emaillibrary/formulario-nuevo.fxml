@@ -81,12 +81,12 @@
             <Insets left="20.0" right="20.0" />
          </padding>
          <children>
-            <Button mnemonicParsing="false" text="Registrar">
+            <Button mnemonicParsing="false" onAction="#onActionRegistrar" text="Registrar">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
             </Button>
-            <Button mnemonicParsing="false" text="Cancelar" />
+            <Button mnemonicParsing="false" onAction="#onActionCancelar" text="Cancelar" />
          </children>
       </HBox>
    </children>

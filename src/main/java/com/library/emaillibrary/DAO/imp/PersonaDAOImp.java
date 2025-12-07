@@ -25,8 +25,8 @@ public class PersonaDAOImp implements PersonaDAO {
                 " s.id_sucursal, s.nombre AS nom_sucursal, s.ciudad, " +
                 " d.id_departamento, d.nombre AS nom_depto " +
                 "FROM Persona p " +
-                "JOIN Sucursal s ON p.id_sucursal = s.id_sucursal " +
-                "JOIN Departamento d ON p.id_departamento = d.id_departamento";
+                "LEFT JOIN Sucursal s ON p.id_sucursal = s.id_sucursal " +
+                "LEFT JOIN Departamento d ON p.id_departamento = d.id_departamento";
 
         try (Connection conn = DataBaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
