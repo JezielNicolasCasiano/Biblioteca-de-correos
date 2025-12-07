@@ -15,8 +15,12 @@
    <center>
       <TableView prefHeight="411.0" prefWidth="438.0" BorderPane.alignment="CENTER">
         <columns>
-          <TableColumn prefWidth="75.0" text="C1" />
-          <TableColumn prefWidth="75.0" text="C2" />
+          <TableColumn prefWidth="75.0" text="Nombre" />
+          <TableColumn prefWidth="75.0" text="Apellido Materno" />
+            <TableColumn prefWidth="75.0" text="Apellido Paterno" />
+            <TableColumn prefWidth="110.20001220703125" text="Correo" />
+            <TableColumn prefWidth="77.79998779296875" text="Departamento" />
+            <TableColumn prefWidth="74.20001220703125" text="Sucursal" />
         </columns>
       </TableView>
    </center>

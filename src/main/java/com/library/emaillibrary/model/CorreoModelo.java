@@ -3,17 +3,14 @@ package com.library.emaillibrary.model;
 public class CorreoModelo {
 
     private Integer idCorreo = null;
-    private Integer idPersona = null;
+    private PersonaModelo persona = null;
     private String parteLocal = null;
     private String dominio = null;
 
-    public CorreoModelo() {
-    }
-
-    public CorreoModelo(String parteLocal, Integer idPersona, Integer idCorreo, String dominio) {
-        this.parteLocal = parteLocal;
-        this.idPersona = idPersona;
+    public CorreoModelo(Integer idCorreo, PersonaModelo persona, String parteLocal, String dominio) {
         this.idCorreo = idCorreo;
+        this.persona = persona;
+        this.parteLocal = parteLocal;
         this.dominio = dominio;
     }
 
@@ -25,20 +22,20 @@ public class CorreoModelo {
         this.idCorreo = idCorreo;
     }
 
-    public Integer getIdPersona() {
-        return idPersona;
-    }
-
-    public void setIdPersona(Integer idPersona) {
-        this.idPersona = idPersona;
-    }
-
     public String getParteLocal() {
         return parteLocal;
     }
 
     public void setParteLocal(String parteLocal) {
         this.parteLocal = parteLocal;
+    }
+
+    public PersonaModelo getPersona() {
+        return persona;
+    }
+
+    public void setPersona(PersonaModelo persona) {
+        this.persona = persona;
     }
 
     public String getDominio() {

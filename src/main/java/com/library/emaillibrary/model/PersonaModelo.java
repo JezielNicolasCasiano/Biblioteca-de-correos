@@ -3,26 +3,14 @@ import java.util.Date;
 
 public class PersonaModelo {
     private Integer idPersona = null;
-    private Integer idSucursal = null;
-    private Integer idDepartamento = null;
+    private SucursalModelo sucursal = null;
+    private DepartamentoModelo departamento = null;
     private String nombre = null;
     private String apellidoPaterno = null;
     private String apellidoMaterno = null;
     private Date fechaDeNacimiento = null;
 
     public PersonaModelo() {
-
-    }
-
-    public PersonaModelo(Integer idDepartamento, Integer idSucursal, Integer idPersona, String nombre,
-                         String apellidoMaterno, String apellidoPaterno, Date fechaDeNacimiento) {
-        this.idDepartamento = idDepartamento;
-        this.idSucursal = idSucursal;
-        this.idPersona = idPersona;
-        this.nombre = nombre;
-        this.apellidoMaterno = apellidoMaterno;
-        this.apellidoPaterno = apellidoPaterno;
-        this.fechaDeNacimiento = fechaDeNacimiento;
     }
 
     public Integer getIdPersona() {
@@ -33,20 +21,20 @@ public class PersonaModelo {
         this.idPersona = idPersona;
     }
 
-    public Integer getIdSucursal() {
-        return idSucursal;
+    public SucursalModelo getSucursal() {
+        return sucursal;
     }
 
-    public void setIdSucursal(Integer idSucursal) {
-        this.idSucursal = idSucursal;
+    public void setSucursal(SucursalModelo sucursal) {
+        this.sucursal = sucursal;
     }
 
-    public Integer getIdDepartamento() {
-        return idDepartamento;
+    public DepartamentoModelo getDepartamento() {
+        return departamento;
     }
 
-    public void setIdDepartamento(Integer idDepartamento) {
-        this.idDepartamento = idDepartamento;
+    public void setDepartamento(DepartamentoModelo departamento) {
+        this.departamento = departamento;
     }
 
     public String getNombre() {
