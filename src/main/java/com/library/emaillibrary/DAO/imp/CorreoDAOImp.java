@@ -65,23 +65,24 @@ public class CorreoDAOImp implements CorreoDAO {
                                             String correoBusqueda, LocalDate fechaNac) throws Exception {
 
         StringBuilder sql = new StringBuilder(SELECT_BASE);
-        sql.append(" WHERE 1=1 ");
+        sql.append(" WHERE 1=1 "); // Truco para concatenar ANDs fácilmente
 
         List<Object> parametros = new ArrayList<>();
 
+        // CORRECCIÓN 1: Usar .trim() al añadir el parámetro
         if (nombre != null && !nombre.trim().isEmpty()) {
             sql.append(" AND LOWER(p.nombre) LIKE ? ");
-            parametros.add("%" + nombre.toLowerCase() + "%");
+            parametros.add("%" + nombre.trim().toLowerCase() + "%");
         }
 
         if (aPaterno != null && !aPaterno.trim().isEmpty()) {
             sql.append(" AND LOWER(p.apellido_paterno) LIKE ? ");
-            parametros.add("%" + aPaterno.toLowerCase() + "%");
+            parametros.add("%" + aPaterno.trim().toLowerCase() + "%");
         }
 
         if (aMaterno != null && !aMaterno.trim().isEmpty()) {
             sql.append(" AND LOWER(p.apellido_materno) LIKE ? ");
-            parametros.add("%" + aMaterno.toLowerCase() + "%");
+            parametros.add("%" + aMaterno.trim().toLowerCase() + "%");
         }
 
         if (idDepartamento != null && idDepartamento > 0) {
@@ -94,17 +95,23 @@ public class CorreoDAOImp implements CorreoDAO {
             parametros.add(idSucursal);
         }
 
+        // CORRECCIÓN 2: Usar TRUNC para comparar solo la fecha, ignorando la hora
         if (fechaNac != null) {
-            sql.append(" AND p.fecha_de_nacimiento = ? ");
+            sql.append(" AND TRUNC(p.fecha_de_nacimiento) = ? ");
             parametros.add(Date.valueOf(fechaNac));
         }
 
         if (correoBusqueda != null && !correoBusqueda.trim().isEmpty()) {
             sql.append(" AND LOWER(c.parte_local || '@' || c.dominio) LIKE ? ");
-            parametros.add("%" + correoBusqueda.toLowerCase() + "%");
+            parametros.add("%" + correoBusqueda.trim().toLowerCase() + "%");
         }
 
         sql.append(" ORDER BY p.apellido_paterno ASC");
+
+        // --- CÓDIGO DE DEPURACIÓN (Pégalo aquí para ver qué pasa en consola) ---
+        System.out.println("SQL Generado: " + sql.toString());
+        System.out.println("Parámetros: " + parametros);
+        // -----------------------------------------------------------------------
 
         List<CorreoModelo> lista = new ArrayList<>();
         try (Connection conn = DataBaseConnection.getConnection();
@@ -120,6 +127,10 @@ public class CorreoDAOImp implements CorreoDAO {
                 }
             }
         }
+
+        // Verificamos cuántos encontró
+        System.out.println("Resultados encontrados: " + lista.size());
+
         return lista;
     }
 
@@ -174,14 +185,19 @@ public class CorreoDAOImp implements CorreoDAO {
             conn = DataBaseConnection.getConnection();
             conn.setAutoCommit(false);
 
-            psPersona = conn.prepareStatement(sqlPersona, Statement.RETURN_GENERATED_KEYS);
+            psPersona = conn.prepareStatement(sqlPersona, new String[]{"ID_PERSONA"});
 
             psPersona.setInt(1, nuevoCorreo.getPersona().getDepartamento().getIdDepartamento());
             psPersona.setInt(2, nuevoCorreo.getPersona().getSucursal().getIdSucursal());
             psPersona.setString(3, nuevoCorreo.getPersona().getNombre());
             psPersona.setString(4, nuevoCorreo.getPersona().getApellidoPaterno());
             psPersona.setString(5, nuevoCorreo.getPersona().getApellidoMaterno());
-            psPersona.setDate(6, new java.sql.Date(nuevoCorreo.getPersona().getFechaDeNacimiento().getTime()));
+
+            if (nuevoCorreo.getPersona().getFechaDeNacimiento() != null) {
+                psPersona.setDate(6, new java.sql.Date(nuevoCorreo.getPersona().getFechaDeNacimiento().getTime()));
+            } else {
+                psPersona.setNull(6, java.sql.Types.DATE);
+            }
 
             int filasAfectadas = psPersona.executeUpdate();
 
