@@ -2,17 +2,14 @@ package com.library.emaillibrary.model;
 
 public class DepartamentoModelo {
 
-    private Integer idDepartamento = null;
-    private String nombre = null;
+    private Integer idDepartamento;
+    private String nombre;
 
     public DepartamentoModelo() {
     }
 
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
+    public DepartamentoModelo(Integer idDepartamento, String nombre) {
+        this.idDepartamento = idDepartamento;
         this.nombre = nombre;
     }
 
@@ -24,4 +21,16 @@ public class DepartamentoModelo {
         this.idDepartamento = idDepartamento;
     }
 
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    @Override
+    public String toString() {
+        return nombre;
+    }
 }

@@ -1,6 +1,5 @@
 package com.library.emaillibrary.DAO.imp;
 
-import com.library.emaillibrary.model.SucursalModelo;
 import com.library.emaillibrary.DAO.SucursalDAO;
 import com.library.emaillibrary.util.DataBaseConnection;
 import java.sql.Connection;

@@ -3,6 +3,7 @@ module com.biblioteca.bibliotecadecorreos {
     requires javafx.fxml;
     requires com.zaxxer.hikari;
     requires java.sql;
+    requires java.desktop;
 
 
     opens com.library.emaillibrary to javafx.fxml;

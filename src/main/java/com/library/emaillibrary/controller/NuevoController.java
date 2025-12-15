@@ -9,7 +9,6 @@ import com.library.emaillibrary.DAO.imp.SucursalDAOImp;
 import com.library.emaillibrary.model.CorreoModelo;
 import com.library.emaillibrary.model.DepartamentoModelo;
 import com.library.emaillibrary.model.PersonaModelo;
-import com.library.emaillibrary.model.SucursalModelo;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

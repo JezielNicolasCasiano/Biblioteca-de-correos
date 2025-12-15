@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="526.0" prefWidth="542.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.library.emaillibrary.controller.MainWindowController">
+   <top>
+      <Label alignment="CENTER" prefHeight="86.0" prefWidth="378.0" text="Persona" BorderPane.alignment="CENTER">
+         <font>
+            <Font name="Arial Bold" size="36.0" />
+         </font>
+      </Label>
+   </top>
+   <center>
+      <TableView fx:id="tablaCorreos" prefHeight="411.0" prefWidth="438.0" BorderPane.alignment="CENTER">
+        <columns>
+          <TableColumn fx:id="colNombre" prefWidth="75.0" text="Nombre" />
+          <TableColumn fx:id="colMaterno" prefWidth="87.19996643066406" text="Apellido Materno" />
+            <TableColumn fx:id="colPaterno" prefWidth="77.60000610351562" text="Apellido Paterno" />
+            <TableColumn fx:id="colCorreo" prefWidth="119.60000610351562" text="Fecha de nacimiento" />
+            <TableColumn fx:id="colDepartamento" prefWidth="129.80001831054688" text="Fecha de fin" />
+        </columns>
+      </TableView>
+   </center>
+   <left>
+      <AnchorPane prefHeight="440.0" prefWidth="25.0" BorderPane.alignment="CENTER" />
+   </left>
+   <right>
+      <AnchorPane prefHeight="360.0" prefWidth="28.0" BorderPane.alignment="CENTER" />
+   </right>
+   <bottom>
+      <HBox prefHeight="80.0" prefWidth="463.0" BorderPane.alignment="CENTER">
+         <children>
+            <AnchorPane prefHeight="80.0" prefWidth="309.0" />
+            <VBox prefHeight="80.0" prefWidth="420.0">
+               <children>
+                  <AnchorPane prefHeight="32.0" prefWidth="341.0" />
+                  <Pane prefHeight="70.0" prefWidth="341.0">
+                     <children>
+                        <Button alignment="CENTER_RIGHT" layoutX="88.0" layoutY="14.0" mnemonicParsing="false" onAction="#onActionEliminar" prefHeight="25.0" prefWidth="64.0" text="Eliminar" />
+                        <Button layoutX="170.0" layoutY="14.0" mnemonicParsing="false" onAction="#onActionEditar" prefHeight="25.0" prefWidth="57.0" text="Editar" />
+                        <Button layoutX="242.0" layoutY="14.0" mnemonicParsing="false" onAction="#onActionNuevo" text="Registrar" />
+                        <Button layoutX="24.0" layoutY="14.0" mnemonicParsing="false" onAction="#onActionBuscar" text="Buscar" />
+                     </children>
+                  </Pane>
+                  <AnchorPane prefHeight="29.0" prefWidth="341.0" />
+               </children>
+            </VBox>
+            <AnchorPane prefHeight="80.0" prefWidth="138.0" />
+         </children>
+      </HBox>
+   </bottom>
+</BorderPane>

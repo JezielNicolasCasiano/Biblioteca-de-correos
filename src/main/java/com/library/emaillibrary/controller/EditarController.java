@@ -8,7 +8,6 @@ import com.library.emaillibrary.DAO.imp.DepartamentoDAOImp;
 import com.library.emaillibrary.DAO.imp.SucursalDAOImp;
 import com.library.emaillibrary.model.CorreoModelo;
 import com.library.emaillibrary.model.DepartamentoModelo;
-import com.library.emaillibrary.model.SucursalModelo;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,7 +22,6 @@ import javafx.util.StringConverter;
 
 import java.net.URL;
 import java.sql.Date;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.ResourceBundle;
 

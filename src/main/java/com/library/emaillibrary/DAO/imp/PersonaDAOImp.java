@@ -4,7 +4,6 @@ import com.library.emaillibrary.DAO.PersonaDAO;
 import com.library.emaillibrary.model.PersonaModelo;
 import com.library.emaillibrary.util.DataBaseConnection;
 import com.library.emaillibrary.model.DepartamentoModelo;
-import com.library.emaillibrary.model.SucursalModelo;
 
 
 import java.sql.Connection;

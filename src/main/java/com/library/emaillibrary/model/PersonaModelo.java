@@ -1,16 +1,30 @@
 package com.library.emaillibrary.model;
-import java.util.Date;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PersonaModelo {
-    private Integer idPersona = null;
-    private SucursalModelo sucursal = null;
-    private DepartamentoModelo departamento = null;
-    private String nombre = null;
-    private String apellidoPaterno = null;
-    private String apellidoMaterno = null;
-    private Date fechaDeNacimiento = null;
+    private Integer idPersona;
+    private String nombre;
+    private String apellidoPaterno;
+    private String apellidoMaterno;
+    private LocalDate fechaDeNacimiento;
+    private LocalDate fechaDeFin; // Nuevo campo según tu SQL
+    private List<DepartamentoModelo> departamentos = new ArrayList<>();
+    private CorreoModelo correo;
 
     public PersonaModelo() {
+    }
+
+    public PersonaModelo(Integer idPersona, String nombre, String apellidoPaterno,
+                         String apellidoMaterno, LocalDate fechaDeNacimiento, LocalDate fechaDeFin) {
+        this.idPersona = idPersona;
+        this.nombre = nombre;
+        this.apellidoPaterno = apellidoPaterno;
+        this.apellidoMaterno = apellidoMaterno;
+        this.fechaDeNacimiento = fechaDeNacimiento;
+        this.fechaDeFin = fechaDeFin;
     }
 
     public Integer getIdPersona() {
@@ -19,22 +33,6 @@ public class PersonaModelo {
 
     public void setIdPersona(Integer idPersona) {
         this.idPersona = idPersona;
-    }
-
-    public SucursalModelo getSucursal() {
-        return sucursal;
-    }
-
-    public void setSucursal(SucursalModelo sucursal) {
-        this.sucursal = sucursal;
-    }
-
-    public DepartamentoModelo getDepartamento() {
-        return departamento;
-    }
-
-    public void setDepartamento(DepartamentoModelo departamento) {
-        this.departamento = departamento;
     }
 
     public String getNombre() {
@@ -61,11 +59,42 @@ public class PersonaModelo {
         this.apellidoMaterno = apellidoMaterno;
     }
 
-    public Date getFechaDeNacimiento() {
+    public LocalDate getFechaDeNacimiento() {
         return fechaDeNacimiento;
     }
 
-    public void setFechaDeNacimiento(Date fechaDeNacimiento) {
+    public void setFechaDeNacimiento(LocalDate fechaDeNacimiento) {
         this.fechaDeNacimiento = fechaDeNacimiento;
+    }
+
+    public LocalDate getFechaDeFin() {
+        return fechaDeFin;
+    }
+
+    public void setFechaDeFin(LocalDate fechaDeFin) {
+        this.fechaDeFin = fechaDeFin;
+    }
+
+    public List<DepartamentoModelo> getDepartamentos() {
+        return departamentos;
+    }
+
+    public void setDepartamentos(List<DepartamentoModelo> departamentos) {
+        this.departamentos = departamentos;
+    }
+
+    public void agregarDepartamento(DepartamentoModelo depto) {
+        if (this.departamentos == null) {
+            this.departamentos = new ArrayList<>();
+        }
+        this.departamentos.add(depto);
+    }
+
+    public CorreoModelo getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(CorreoModelo correo) {
+        this.correo = correo;
     }
 }

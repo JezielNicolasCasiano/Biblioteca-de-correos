@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="228.0" prefWidth="510.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.library.emaillibrary.controller.NuevoController">
+   <padding>
+      <Insets top="20.0" />
+   </padding>
+   <children>
+      <Label alignment="CENTER" prefHeight="28.0" prefWidth="496.0" text="Registrar">
+         <font>
+            <Font name="Arial Bold" size="41.0" />
+         </font>
+      </Label>
+      <GridPane>
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="245.60003662109375" minWidth="10.0" prefWidth="152.8" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="343.20001220703125" minWidth="10.0" prefWidth="304.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="60.8" minHeight="10.0" prefHeight="33.60001220703125" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+         <padding>
+            <Insets left="20.0" right="20.0" />
+         </padding>
+         <children>
+            <Label prefHeight="18.0" prefWidth="231.0" text="Nombre:" />
+            <TextField fx:id="txtNombre" GridPane.columnIndex="1" />
+         </children>
+      </GridPane>
+      <HBox alignment="CENTER_RIGHT" prefHeight="96.0" prefWidth="492.0" spacing="20.0">
+         <padding>
+            <Insets left="20.0" right="20.0" />
+         </padding>
+         <children>
+            <Button mnemonicParsing="false" onAction="#onActionRegistrar" text="Registrar">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#onActionCancelar" text="Cancelar" />
+         </children>
+      </HBox>
+   </children>
+</VBox>

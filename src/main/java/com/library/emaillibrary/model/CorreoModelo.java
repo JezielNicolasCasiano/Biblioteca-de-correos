@@ -2,16 +2,19 @@ package com.library.emaillibrary.model;
 
 public class CorreoModelo {
 
-    private Integer idCorreo = null;
-    private PersonaModelo persona = null;
-    private String parteLocal = null;
-    private String dominio = null;
+    private Integer idCorreo;
+    private String parteLocal;
+    private String dominio;
+    private PersonaModelo persona;
 
-    public CorreoModelo(Integer idCorreo, PersonaModelo persona, String parteLocal, String dominio) {
+    public CorreoModelo() {
+    }
+
+    public CorreoModelo(Integer idCorreo, String parteLocal, String dominio, PersonaModelo persona) {
         this.idCorreo = idCorreo;
-        this.persona = persona;
         this.parteLocal = parteLocal;
         this.dominio = dominio;
+        this.persona = persona;
     }
 
     public Integer getIdCorreo() {
@@ -30,6 +33,14 @@ public class CorreoModelo {
         this.parteLocal = parteLocal;
     }
 
+    public String getDominio() {
+        return dominio;
+    }
+
+    public void setDominio(String dominio) {
+        this.dominio = dominio;
+    }
+
     public PersonaModelo getPersona() {
         return persona;
     }
@@ -38,12 +49,8 @@ public class CorreoModelo {
         this.persona = persona;
     }
 
-    public String getDominio() {
-        return dominio;
-    }
-
-    public void setDominio(String dominio) {
-        this.dominio = dominio;
+    public String getEmailCompleto() {
+        return parteLocal + "@" + dominio;
     }
 }
 

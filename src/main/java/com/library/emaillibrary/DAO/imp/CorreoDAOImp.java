@@ -4,7 +4,6 @@ import com.library.emaillibrary.DAO.CorreoDAO;
 import com.library.emaillibrary.model.CorreoModelo;
 import com.library.emaillibrary.model.DepartamentoModelo;
 import com.library.emaillibrary.model.PersonaModelo;
-import com.library.emaillibrary.model.SucursalModelo;
 import com.library.emaillibrary.util.DataBaseConnection;
 
 import java.sql.*;
@@ -65,11 +64,10 @@ public class CorreoDAOImp implements CorreoDAO {
                                             String correoBusqueda, LocalDate fechaNac) throws Exception {
 
         StringBuilder sql = new StringBuilder(SELECT_BASE);
-        sql.append(" WHERE 1=1 "); // Truco para concatenar ANDs fácilmente
+        sql.append(" WHERE 1=1 ");
 
         List<Object> parametros = new ArrayList<>();
 
-        // CORRECCIÓN 1: Usar .trim() al añadir el parámetro
         if (nombre != null && !nombre.trim().isEmpty()) {
             sql.append(" AND LOWER(p.nombre) LIKE ? ");
             parametros.add("%" + nombre.trim().toLowerCase() + "%");
@@ -95,7 +93,6 @@ public class CorreoDAOImp implements CorreoDAO {
             parametros.add(idSucursal);
         }
 
-        // CORRECCIÓN 2: Usar TRUNC para comparar solo la fecha, ignorando la hora
         if (fechaNac != null) {
             sql.append(" AND TRUNC(p.fecha_de_nacimiento) = ? ");
             parametros.add(Date.valueOf(fechaNac));
@@ -108,10 +105,9 @@ public class CorreoDAOImp implements CorreoDAO {
 
         sql.append(" ORDER BY p.apellido_paterno ASC");
 
-        // --- CÓDIGO DE DEPURACIÓN (Pégalo aquí para ver qué pasa en consola) ---
-        System.out.println("SQL Generado: " + sql.toString());
-        System.out.println("Parámetros: " + parametros);
-        // -----------------------------------------------------------------------
+        //System.out.println("SQL Generado: " + sql.toString());
+        //System.out.println("Parámetros: " + parametros);
+
 
         List<CorreoModelo> lista = new ArrayList<>();
         try (Connection conn = DataBaseConnection.getConnection();
@@ -128,8 +124,7 @@ public class CorreoDAOImp implements CorreoDAO {
             }
         }
 
-        // Verificamos cuántos encontró
-        System.out.println("Resultados encontrados: " + lista.size());
+        //System.out.println("Resultados encontrados: " + lista.size());
 
         return lista;
     }
