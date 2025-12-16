@@ -1,0 +1,40 @@
+package com.library.emaillibrary.controller.departamento;
+
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+
+public class BusquedaDepartamentoController {
+
+    @FXML
+    private TextField txtNombre;
+
+    private DepartamentoWindowController parentController;
+
+    public void setParentController(DepartamentoWindowController parentController) {
+        this.parentController = parentController;
+    }
+
+    @FXML
+    void onActionBuscar(ActionEvent event) {
+        if (parentController != null) {
+            // Extraemos el texto y le decimos al padre que filtre
+            String nombreABuscar = txtNombre.getText();
+            parentController.realizarBusqueda(nombreABuscar);
+        }
+        cerrarVentana(event);
+    }
+
+    @FXML
+    void onActionCancelar(ActionEvent event) {
+        cerrarVentana(event);
+    }
+
+    private void cerrarVentana(ActionEvent event) {
+        Node source = (Node) event.getSource();
+        Stage stage = (Stage) source.getScene().getWindow();
+        stage.close();
+    }
+}

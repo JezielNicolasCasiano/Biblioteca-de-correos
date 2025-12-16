@@ -10,4 +10,6 @@ module com.biblioteca.bibliotecadecorreos {
     exports com.library.emaillibrary;
     exports com.library.emaillibrary.controller;
     opens com.library.emaillibrary.controller to javafx.fxml;
+    exports com.library.emaillibrary.controller.departamento;
+    opens com.library.emaillibrary.controller.departamento to javafx.fxml;
 }
