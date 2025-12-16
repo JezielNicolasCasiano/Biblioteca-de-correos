@@ -57,7 +57,7 @@
                   <Insets left="130.0" />
                </GridPane.margin>
             </DatePicker>
-            <Button mnemonicParsing="false" onAction="#onActionEditar" prefHeight="26.0" prefWidth="364.0" text="Buscar departamento" GridPane.columnIndex="1" GridPane.rowIndex="3">
+            <Button mnemonicParsing="false" onAction="#onActionEditar" prefHeight="26.0" prefWidth="364.0" text="Seleccionar departamento" GridPane.columnIndex="1" GridPane.rowIndex="3">
                <GridPane.margin>
                   <Insets left="130.0" />
                </GridPane.margin>

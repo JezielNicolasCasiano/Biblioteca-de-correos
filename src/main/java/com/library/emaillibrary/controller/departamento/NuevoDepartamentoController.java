@@ -1,7 +1,5 @@
 package com.library.emaillibrary.controller.departamento;
 
-import com.library.emaillibrary.DAO.Departamento;
-import com.library.emaillibrary.DAO.imp.DepartamentoDAOImp;
 import com.library.emaillibrary.model.DepartamentoModelo;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,41 +12,63 @@ public class NuevoDepartamentoController {
 
     @FXML private TextField txtNombre;
 
-    private Departamento departamentoDAO = new DepartamentoDAOImp();
-    private DepartamentoWindowController parentController;
+    private DepartamentoModelo departamentoEdicion;
 
-    public void setParentController(DepartamentoWindowController parentController) {
-        this.parentController = parentController;
+    // Interfaz para comunicarse con el padre
+    public interface DepartamentoFormularioListener {
+        void onGuardar(DepartamentoModelo departamento);
     }
 
-    @FXML
-    void onActionRegistrar(ActionEvent event) {
-        try {
-            if (txtNombre.getText().isEmpty()) {
-                mostrarAlerta(Alert.AlertType.WARNING, "Campos vacíos", "El nombre es obligatorio.");
-                return;
-            }
+    private DepartamentoFormularioListener listener;
 
-            DepartamentoModelo nuevo = new DepartamentoModelo();
-            nuevo.setNombre(txtNombre.getText().trim());
+    public void setListener(DepartamentoFormularioListener listener) {
+        this.listener = listener;
+    }
 
-            departamentoDAO.insertar(nuevo);
+    /**
+     * Inicializa el formulario.
+     * @param departamento Null para nuevo registro, Objeto para editar.
+     */
+    public void initAttributes(DepartamentoModelo departamento) {
+        this.departamentoEdicion = departamento;
 
-            mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "Departamento registrado.");
-
-            // Actualizar la tabla de la ventana padre
-            if (parentController != null) {
-                parentController.cargarDatos();
-            }
-            cerrarVentana(event);
-
-        } catch (Exception e) {
-            mostrarAlerta(Alert.AlertType.ERROR, "Error", "Error al guardar: " + e.getMessage());
+        if (departamento != null) {
+            // MODO EDICIÓN: Pre-cargar datos
+            txtNombre.setText(departamento.getNombre());
+        } else {
+            // MODO REGISTRO: Limpiar
+            txtNombre.clear();
         }
     }
 
     @FXML
-    void onActionCancelar(ActionEvent event) {
+    void actionGuardar(ActionEvent event) {
+        String nombre = txtNombre.getText().trim();
+
+        // 1. Validaciones simples
+        if (nombre.isEmpty()) {
+            mostrarAlerta("Validación", "El nombre del departamento no puede estar vacío.");
+            return;
+        }
+
+        // 2. Preparar el objeto
+        if (departamentoEdicion == null) {
+            departamentoEdicion = new DepartamentoModelo();
+        }
+
+        // Actualizamos el nombre (el ID se conserva si ya existía)
+        departamentoEdicion.setNombre(nombre);
+
+        // 3. Enviamos al padre
+        if (listener != null) {
+            listener.onGuardar(departamentoEdicion);
+        }
+
+        cerrarVentana(event);
+    }
+
+    @FXML
+    void actionCancelar(ActionEvent event) {
         cerrarVentana(event);
     }
 
@@ -58,10 +78,11 @@ public class NuevoDepartamentoController {
         stage.close();
     }
 
-    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
-        Alert alert = new Alert(tipo);
+    private void mostrarAlerta(String titulo, String contenido) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(titulo);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
+        alert.setHeaderText(null);
+        alert.setContentText(contenido);
+        alert.show();
     }
 }

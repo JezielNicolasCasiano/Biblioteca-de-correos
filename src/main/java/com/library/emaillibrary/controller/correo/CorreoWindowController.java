@@ -2,7 +2,6 @@ package com.library.emaillibrary.controller.correo;
 
 import com.library.emaillibrary.DAO.CorreoDAO;
 import com.library.emaillibrary.DAO.imp.CorreoDAOImp;
-import com.library.emaillibrary.controller.persona.PersonaRegistrarController;
 import com.library.emaillibrary.model.CorreoModelo;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -19,6 +18,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -26,17 +26,11 @@ public class CorreoWindowController implements Initializable {
 
     @FXML private TableView<CorreoModelo> tblCorreos;
     @FXML private TableColumn<CorreoModelo, String> colId;
-    @FXML private TableColumn<CorreoModelo, String> colCorreo; // Email completo
-    @FXML private TableColumn<CorreoModelo, String> colPropietario; // Nombre de la persona
-
-    @FXML private Button btnRegistrar;
-    @FXML private Button btnEditar;
-    @FXML private Button btnEliminar;
-    @FXML private Button btnBuscar;
-    @FXML private TextField txtBusqueda; // Campo para buscar por nombre o correo
+    @FXML private TableColumn<CorreoModelo, String> colCorreo;
+    @FXML private TableColumn<CorreoModelo, String> colPropietario;
 
     private final CorreoDAO correoDAO = new CorreoDAOImp();
-    private ObservableList<CorreoModelo> listaCorreos = FXCollections.observableArrayList();
+    private final ObservableList<CorreoModelo> listaCorreos = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -46,101 +40,158 @@ public class CorreoWindowController implements Initializable {
 
     private void configurarColumnas() {
         colId.setCellValueFactory(cell -> new SimpleStringProperty(String.valueOf(cell.getValue().getIdCorreo())));
-
-        // Unimos parte local y dominio para mostrar el correo completo
         colCorreo.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getEmailCompleto()));
-
-        // Mostramos el nombre completo del dueño
-        colPropietario.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getPersona().toString()));
+        colPropietario.setCellValueFactory(cell -> {
+            if (cell.getValue().getPersona() != null) {
+                return new SimpleStringProperty(cell.getValue().getPersona().toString());
+            }
+            return new SimpleStringProperty("Sin Asignar");
+        });
+        tblCorreos.setItems(listaCorreos);
     }
 
     public void cargarDatos() {
         try {
             listaCorreos.setAll(correoDAO.listarTodos());
-            tblCorreos.setItems(listaCorreos);
         } catch (Exception e) {
-            mostrarAlerta("Error al cargar correos", e.getMessage(), Alert.AlertType.ERROR);
+            mostrarAlerta("Error", "Error al cargar correos: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    // --- LÓGICA DE BÚSQUEDA (Manteniendo lo anterior) ---
+    public void realizarBusqueda(String parteLocal, String dominio) {
+        try {
+            List<CorreoModelo> resultados = correoDAO.buscarPorCorreo(parteLocal, dominio);
+            listaCorreos.setAll(resultados);
+            if (listaCorreos.isEmpty()) {
+                mostrarAlerta("Info", "No se encontraron resultados.", Alert.AlertType.INFORMATION);
+            }
+        } catch (Exception e) {
+            mostrarAlerta("Error", "Fallo al buscar: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
     @FXML
+    void actionBuscar(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/library/emaillibrary/formulario-busqueda-correo.fxml"));
+            Parent root = loader.load();
+
+            BusquedaCorreoController controller = loader.getController();
+            controller.setBusquedaListener((pl, dom) -> this.realizarBusqueda(pl, dom));
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(tblCorreos.getScene().getWindow());
+            stage.setTitle("Buscar Correos");
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (IOException e) {
+            mostrarAlerta("Error", "No se pudo abrir búsqueda.", Alert.AlertType.ERROR);
+        }
+    }
+
+    // --- LÓGICA DE REGISTRO / EDICIÓN (Nueva Lógica Desacoplada) ---
+
+    @FXML
     void actionRegistrar(ActionEvent event) {
-        abrirFormulario(null, "Registrar Correo");
+        abrirFormulario(null, "Registrar Nuevo Correo");
     }
 
     @FXML
     void actionEditar(ActionEvent event) {
-        CorreoModelo seleccionado = tblCorreos.getSelectionModel().getSelectedItem();
-        if (seleccionado == null) {
-            mostrarAlerta("Selección requerida", "Por favor selecciona un correo para editar.", Alert.AlertType.WARNING);
+        // 1. Obtener el ítem seleccionado de la tabla
+        CorreoModelo correoSeleccionado = tblCorreos.getSelectionModel().getSelectedItem();
+
+        if (correoSeleccionado == null) {
+            mostrarAlerta("Aviso", "Por favor, seleccione un correo de la lista para editar.", Alert.AlertType.WARNING);
             return;
         }
-        abrirFormulario(seleccionado, "Editar Correo");
+
+        // 2. Abrir el formulario pasando el objeto
+        abrirFormulario(correoSeleccionado, "Editar Correo Existente");
+    }
+
+    /**
+     * Método genérico para abrir el formulario (sirve para Crear y Editar)
+     */
+    private void abrirFormulario(CorreoModelo correo, String tituloVentana) {
+        try {
+            // IMPORTANTE: Usa el MISMO FXML para registrar y editar.
+            // Si usas 'formulario-editar-correo.fxml', asegúrate de que tenga asignado el 'CorreoRegistrarController'
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/library/emaillibrary/formulario-nuevo-correo.fxml"));
+            Parent root = loader.load();
+
+            CorreoRegistrarController controller = loader.getController();
+
+            // AQUI OCURRE LA MAGIA: Pasamos el objeto para que se llenen los campos
+            controller.initAttributes(correo);
+
+            // Definimos qué hacer al guardar
+            controller.setListener((correoProcesado) -> {
+                try {
+                    if (correoProcesado.getIdCorreo() != null) {
+                        // SI TIENE ID -> ES UNA ACTUALIZACIÓN (UPDATE)
+                        correoDAO.actualizar(correoProcesado);
+                        mostrarAlerta("Éxito", "El correo se actualizó correctamente.", Alert.AlertType.INFORMATION);
+                    } else {
+                        // SI NO TIENE ID -> ES UN REGISTRO NUEVO (INSERT)
+                        correoDAO.insertar(correoProcesado);
+                        mostrarAlerta("Éxito", "El correo se registró correctamente.", Alert.AlertType.INFORMATION);
+                    }
+                    // Refrescar la tabla para ver los cambios
+                    cargarDatos();
+
+                } catch (Exception e) {
+                    mostrarAlerta("Error de Base de Datos", "No se pudo guardar los cambios: " + e.getMessage(), Alert.AlertType.ERROR);
+                    e.printStackTrace();
+                }
+            });
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle(tituloVentana);
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta("Error UI", "No se pudo cargar el formulario.", Alert.AlertType.ERROR);
+        }
     }
 
     @FXML
     void actionEliminar(ActionEvent event) {
         CorreoModelo seleccionado = tblCorreos.getSelectionModel().getSelectedItem();
         if (seleccionado == null) {
-            mostrarAlerta("Selección requerida", "Por favor selecciona un correo para eliminar.", Alert.AlertType.WARNING);
+            mostrarAlerta("Aviso", "Seleccione un correo para eliminar.", Alert.AlertType.WARNING);
             return;
         }
 
-        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmacion.setTitle("Confirmar eliminación");
-        confirmacion.setHeaderText("¿Estás seguro de eliminar el correo de " + seleccionado.getPersona().getNombre() + "?");
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmar");
+        confirm.setHeaderText("¿Eliminar correo?");
+        confirm.setContentText("Se eliminará: " + seleccionado.getEmailCompleto());
 
-        Optional<ButtonType> resultado = confirmacion.showAndWait();
-        if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
                 correoDAO.eliminar(seleccionado.getIdCorreo());
                 cargarDatos();
             } catch (Exception e) {
-                mostrarAlerta("Error al eliminar", e.getMessage(), Alert.AlertType.ERROR);
+                mostrarAlerta("Error", "No se pudo eliminar: " + e.getMessage(), Alert.AlertType.ERROR);
             }
-        }
-    }
-
-    private void abrirFormulario(CorreoModelo correo, String titulo) {
-        try {
-            // Nota: Asegúrate de que tu FXML apunta a 'CorreoRegistrarController'
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/library/emaillibrary/formulario-nuevo-correo.fxml"));
-            Parent root = loader.load();
-
-            CorreoRegistrarController controller = loader.getController();
-            controller.initAttributes(correo, this); // Pasamos el correo (o null) y este controlador para refrescar
-
-            Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle(titulo);
-            stage.setScene(new Scene(root));
-            stage.showAndWait();
-
-        } catch (IOException e) {
-            mostrarAlerta("Error de interfaz", "No se pudo abrir el formulario: " + e.getMessage(), Alert.AlertType.ERROR);
-            e.printStackTrace();
         }
     }
 
     private void mostrarAlerta(String titulo, String contenido, Alert.AlertType tipo) {
         Alert alert = new Alert(tipo);
         alert.setTitle(titulo);
+        alert.setHeaderText(null);
         alert.setContentText(contenido);
         alert.show();
     }
-    private PersonaRegistrarController personaController;
 
-    public void setModoSeleccion(PersonaRegistrarController controller) {
-        this.personaController = controller;
-        // Opcional: Cambiar texto del botón "Editar" a "Seleccionar"
-    }
 
-    // Agregar un botón "Seleccionar" en el FXML o reutilizar uno
-    public void actionSeleccionar() {
-        CorreoModelo seleccionado = tblCorreos.getSelectionModel().getSelectedItem();
-        if (personaController != null && seleccionado != null) {
-            personaController.recibirCorreo(seleccionado);
-            cerrarVentana();
-        }
-    }
+
 }

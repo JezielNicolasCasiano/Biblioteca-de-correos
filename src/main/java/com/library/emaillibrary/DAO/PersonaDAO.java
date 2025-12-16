@@ -9,8 +9,5 @@ public interface PersonaDAO {
     void actualizar(PersonaModelo persona) throws Exception;
     void eliminar(int idPersona) throws Exception;
     List<PersonaModelo> listarTodas() throws Exception;
-    List<PersonaModelo> listarParaSeleccionCorreo() throws Exception;
-    List<PersonaModelo> buscarPersonas(String nombre, String aPaterno, String aMaterno,
-                                       LocalDate fechaNac, LocalDate fechaFin,
-                                       Integer idDepartamento) throws Exception;
+    List<PersonaModelo> buscarPersonas(String nombre, String paterno, String materno, LocalDate fechaNac, LocalDate fechaFin, String unused) throws Exception;
 }

@@ -1,7 +1,5 @@
 package com.library.emaillibrary.controller.departamento;
 
-import com.library.emaillibrary.controller.persona.PersonaRegistrarController;
-import com.library.emaillibrary.model.DepartamentoModelo;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -10,21 +8,25 @@ import javafx.stage.Stage;
 
 public class BusquedaDepartamentoController {
 
-    @FXML
-    private TextField txtNombre;
+    @FXML private TextField txtNombre;
 
-    private DepartamentoWindowController parentController;
+    // Interfaz funcional para pasar el filtro al padre
+    public interface BusquedaDepartamentoListener {
+        void onBuscar(String nombre);
+    }
 
-    public void setParentController(DepartamentoWindowController parentController) {
-        this.parentController = parentController;
+    private BusquedaDepartamentoListener listener;
+
+    public void setBusquedaListener(BusquedaDepartamentoListener listener) {
+        this.listener = listener;
     }
 
     @FXML
     void onActionBuscar(ActionEvent event) {
-        if (parentController != null) {
-            // Extraemos el texto y le decimos al padre que filtre
-            String nombreABuscar = txtNombre.getText();
-            parentController.realizarBusqueda(nombreABuscar);
+        if (listener != null) {
+            String nombre = txtNombre.getText();
+            // Enviamos el dato al listener
+            listener.onBuscar(nombre);
         }
         cerrarVentana(event);
     }
@@ -38,19 +40,5 @@ public class BusquedaDepartamentoController {
         Node source = (Node) event.getSource();
         Stage stage = (Stage) source.getScene().getWindow();
         stage.close();
-    }
-    private PersonaRegistrarController personaController;
-
-    public void setPersonaRegistrarController(PersonaRegistrarController controller) {
-        this.personaController = controller;
-    }
-
-    // En el botón "Seleccionar" o al doble click en la tabla:
-    public void seleccionar() {
-        DepartamentoModelo seleccionado = tabla.getSelectionModel().getSelectedItem();
-        if (personaController != null && seleccionado != null) {
-            personaController.recibirDepartamento(seleccionado);
-            cerrarVentana();
-        }
     }
 }

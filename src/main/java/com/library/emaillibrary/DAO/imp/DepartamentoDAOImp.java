@@ -1,6 +1,6 @@
 package com.library.emaillibrary.DAO.imp;
 
-import com.library.emaillibrary.DAO.Departamento;
+import com.library.emaillibrary.DAO.DepartamentoDAO;
 import com.library.emaillibrary.model.DepartamentoModelo;
 import com.library.emaillibrary.util.DataBaseConnection;
 
@@ -10,7 +10,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DepartamentoDAOImp implements Departamento {
+public class DepartamentoDAOImp implements DepartamentoDAO {
 
     @Override
     public List<DepartamentoModelo> listarDepartamento() throws Exception {
@@ -72,11 +72,13 @@ public class DepartamentoDAOImp implements Departamento {
     @Override
     public List<DepartamentoModelo> buscarPorNombre(String nombre) throws Exception {
         List<DepartamentoModelo> lista = new ArrayList<>();
+        // Usamos LOWER y LIKE para búsqueda insensible a mayúsculas/minúsculas
         String sql = "SELECT id_departamento, nombre FROM Departamento WHERE LOWER(nombre) LIKE ? ORDER BY nombre";
 
         try (Connection conn = DataBaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
+            // Agregamos los comodines % para que busque coincidencias parciales
             ps.setString(1, "%" + nombre.toLowerCase() + "%");
 
             try (ResultSet rs = ps.executeQuery()) {
