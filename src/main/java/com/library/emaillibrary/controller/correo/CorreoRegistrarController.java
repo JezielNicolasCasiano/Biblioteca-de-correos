@@ -1,101 +1,169 @@
 package com.library.emaillibrary.controller.correo;
 
+import com.library.emaillibrary.DAO.CorreoDAO;
+import com.library.emaillibrary.DAO.PersonaDAO;
+import com.library.emaillibrary.DAO.imp.CorreoDAOImp;
+import com.library.emaillibrary.DAO.imp.PersonaDAOImp;
+import com.library.emaillibrary.model.CorreoModelo;
+import com.library.emaillibrary.model.PersonaModelo;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-import java.sql.SQLException;
-import com.library.emaillibrary.DAO.*;
-import com.library.emaillibrary.model.*;
 
+import java.io.IOException;
 
 public class CorreoRegistrarController {
 
-    @FXML private TextField txtCorreo;
-    @FXML private TextField txtPersona; // Campo de texto NO editable (solo muestra nombre)
-    @FXML private Button btnBuscarPersona;
+    @FXML private TextField txtParteLocal;
+    @FXML private TextField txtDominio;
+    @FXML private Label lblPersonaSeleccionada;
 
-    private Stage stage;
-    private CorreoDAO correoDAO;
-    private PersonaModelo personaSeleccionada; // La persona que el usuario elija
+    private CorreoModelo correoEdicion; // El correo que estamos editando (null si es nuevo)
+    private PersonaModelo personaSeleccionada;
 
-    // Inicializamos las dependencias
-    public void init(Stage stage, CorreoDAO correoDAO) {
-        this.stage = stage;
-        this.correoDAO = correoDAO;
-        txtPersona.setEditable(false); // Importante: que no escriban el nombre a mano
-    }
+    private CorreoWindowController parentController;
+    private final CorreoDAO correoDAO = new CorreoDAOImp();
+    // private final PersonaDAO personaDAO = new PersonaDAOImp(); // Útil si validas algo extra
 
-    @FXML
-    private void abrirBusquedaPersona() {
-        // TODO: Aquí debes abrir tu ventana de "Lista de Personas" existente.
-        // Lo ideal es abrirla como modal y esperar el resultado, o pasarle 'this'
-        // para que ella te devuelva la persona seleccionada.
+    /**
+     * Método llamado desde la ventana principal para pasar datos.
+     */
+    public void initAttributes(CorreoModelo correo, CorreoWindowController parent) {
+        this.parentController = parent;
+        this.correoEdicion = correo;
 
-        System.out.println("Abriendo selector de personas...");
-        // Cuando recuperes la persona desde tu otra ventana, llámame a este método:
-        // setPersonaSeleccionada(personaRecuperada);
-    }
-
-    // Este método lo llamarás desde tu ventana de búsqueda de personas al hacer doble click
-    public void setPersonaSeleccionada(PersonaModelo persona) {
-        this.personaSeleccionada = persona;
-        if (persona != null) {
-            txtPersona.setText(persona.getNombre() + " " + persona.getApellidoPaterno());
+        if (correo != null) {
+            // Modo Edición
+            this.personaSeleccionada = correo.getPersona();
+            txtParteLocal.setText(correo.getParteLocal());
+            txtDominio.setText(correo.getDominio());
+            actualizarLabelPersona();
+        } else {
+            // Modo Registro
+            lblPersonaSeleccionada.setText("Seleccione una persona...");
         }
     }
 
     @FXML
-    private void guardar() {
-        // 1. Validar que tengamos datos
-        if (txtCorreo.getText().isEmpty() || personaSeleccionada == null) {
-            mostrarAlerta(Alert.AlertType.WARNING, "Faltan Datos", "Por favor ingrese un correo y seleccione una persona.");
+    void actionBuscarPersona(ActionEvent event) {
+        try {
+            // Abrimos la ventana de búsqueda de personas
+            // IMPORTANTE: Asegúrate de tener 'formulario-busqueda-persona.fxml'
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/library/emaillibrary/formulario-busqueda-persona.fxml"));
+            Parent root = loader.load();
+
+            // Asumimos que existe un BusquedaPersonaController o genérico
+            // Si usas el BusquedaController genérico, asegúrate de que pueda devolver el objeto
+            // Aquí simulo que tienes un controlador específico o adaptado:
+            BusquedaPersonaController controller = loader.getController();
+            controller.setRegistrarController(this); // Para que sepa a quién devolver la persona
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Seleccionar Persona");
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+
+        } catch (IOException e) {
+            mostrarAlerta("Error", "No se pudo abrir la búsqueda de personas.", Alert.AlertType.ERROR);
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Este método lo llamará el buscador de personas cuando el usuario elija a alguien.
+     */
+    public void recibirPersona(PersonaModelo persona) {
+        // VALIDACIÓN 1: La persona debe estar viva (fecha_fin == null)
+        if (!persona.estaViva()) {
+            mostrarAlerta("Persona no válida", "No se puede asignar correo a una persona fallecida (Fecha Fin registrada).", Alert.AlertType.WARNING);
             return;
         }
 
-        // 2. VALIDACIÓN LÓGICA: Verificar si la persona falleció o está de baja
-        // Accedemos directamente al atributo del modelo
-        if (personaSeleccionada.getFechaFin() != null) {
-            mostrarAlerta(Alert.AlertType.ERROR, "Acción Inválida",
-                    "No se puede asignar un correo a una persona dada de baja (con Fecha Fin).");
+        // VALIDACIÓN 2: Unicidad (1:1).
+        // Si es registro nuevo, la persona NO debe tener correo.
+        // Si es edición, la persona puede tener correo solo si es ESTE mismo correo.
+        boolean tieneCorreo = (persona.getCorreo() != null);
+
+        // Nota: Para que 'persona.getCorreo()' funcione, tu PersonaDAO debe cargar esa relación,
+        // o debes consultar a la BD aquí si esa persona ya tiene ID en la tabla Correo.
+        // Asumiremos por ahora que confías en la selección o haces una consulta rápida:
+        // if (correoDAO.existeCorreoParaPersona(persona.getId()) && (correoEdicion == null || !correoEdicion.getPersona().equals(persona))) ...
+
+        this.personaSeleccionada = persona;
+        actualizarLabelPersona();
+    }
+
+    private void actualizarLabelPersona() {
+        if (personaSeleccionada != null) {
+            lblPersonaSeleccionada.setText(personaSeleccionada.toString() + " (ID: " + personaSeleccionada.getIdPersona() + ")");
+        }
+    }
+
+    @FXML
+    void actionGuardar(ActionEvent event) {
+        // Validaciones básicas de campos
+        if (personaSeleccionada == null) {
+            mostrarAlerta("Faltan datos", "Debe seleccionar una persona propietaria del correo.", Alert.AlertType.WARNING);
+            return;
+        }
+        if (txtParteLocal.getText().isEmpty() || txtDominio.getText().isEmpty()) {
+            mostrarAlerta("Faltan datos", "Debe completar la parte local y el dominio.", Alert.AlertType.WARNING);
             return;
         }
 
         try {
-            // 3. Crear el objeto Correo
-            // Asumo que tu constructor acepta (direccion, id_persona)
-            CorreoModelo nuevoCorreo = new CorreoModelo();
-            nuevoCorreo.set(txtCorreo.getText());
-            nuevoCorreo.setPersona(personaSeleccionada.getId());
+            if (correoEdicion == null) {
+                // REGISTRO NUEVO
+                CorreoModelo nuevoCorreo = new CorreoModelo();
+                nuevoCorreo.setPersona(personaSeleccionada);
+                nuevoCorreo.setParteLocal(txtParteLocal.getText());
+                nuevoCorreo.setDominio(txtDominio.getText());
 
-            // 4. Intentar guardar en BD
-            correoDAO.insertar(nuevoCorreo);
-
-            mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "Correo registrado correctamente.");
-            stage.close();
-
-        } catch (SQLException e) {
-            // 5. MANEJO DE EXCEPCIÓN: Duplicidad (Dos correos para la misma persona)
-            if (e.getErrorCode() == 1) { // ORA-00001 (Unique Constraint)
-                mostrarAlerta(Alert.AlertType.ERROR, "Correo Duplicado",
-                        "Esta persona YA TIENE un correo registrado.\nSolo se permite uno por persona.");
+                correoDAO.insertar(nuevoCorreo);
+                mostrarAlerta("Éxito", "Correo registrado correctamente.", Alert.AlertType.INFORMATION);
             } else {
-                mostrarAlerta(Alert.AlertType.ERROR, "Error SQL", "Error al guardar: " + e.getMessage());
+                // EDICIÓN
+                correoEdicion.setPersona(personaSeleccionada);
+                correoEdicion.setParteLocal(txtParteLocal.getText());
+                correoEdicion.setDominio(txtDominio.getText());
+
+                correoDAO.actualizar(correoEdicion);
+                mostrarAlerta("Éxito", "Correo actualizado correctamente.", Alert.AlertType.INFORMATION);
             }
+
+            // Cerrar y refrescar
+            if (parentController != null) {
+                parentController.cargarDatos();
+            }
+            cerrarVentana();
+
+        } catch (Exception e) {
+            mostrarAlerta("Error de Base de Datos", "No se pudo guardar los cambios: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
 
     @FXML
-    private void cancelar() {
-        if (stage != null) stage.close();
+    void actionCancelar(ActionEvent event) {
+        cerrarVentana();
     }
 
-    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String contenido) {
+    private void cerrarVentana() {
+        Stage stage = (Stage) txtParteLocal.getScene().getWindow();
+        stage.close();
+    }
+
+    private void mostrarAlerta(String titulo, String contenido, Alert.AlertType tipo) {
         Alert alert = new Alert(tipo);
         alert.setTitle(titulo);
-        alert.setHeaderText(null);
         alert.setContentText(contenido);
-        alert.showAndWait();
+        alert.show();
     }
 }

@@ -1,5 +1,7 @@
 package com.library.emaillibrary.controller.departamento;
 
+import com.library.emaillibrary.controller.persona.PersonaRegistrarController;
+import com.library.emaillibrary.model.DepartamentoModelo;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -36,5 +38,19 @@ public class BusquedaDepartamentoController {
         Node source = (Node) event.getSource();
         Stage stage = (Stage) source.getScene().getWindow();
         stage.close();
+    }
+    private PersonaRegistrarController personaController;
+
+    public void setPersonaRegistrarController(PersonaRegistrarController controller) {
+        this.personaController = controller;
+    }
+
+    // En el botón "Seleccionar" o al doble click en la tabla:
+    public void seleccionar() {
+        DepartamentoModelo seleccionado = tabla.getSelectionModel().getSelectedItem();
+        if (personaController != null && seleccionado != null) {
+            personaController.recibirDepartamento(seleccionado);
+            cerrarVentana();
+        }
     }
 }
