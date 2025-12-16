@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="242.0" prefWidth="536.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.library.emaillibrary.controller.BusquedaController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="266.0" prefWidth="536.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.library.emaillibrary.controller.BusquedaController">
    <padding>
       <Insets top="20.0" />
    </padding>
@@ -23,6 +23,7 @@
         <rowConstraints>
           <RowConstraints maxHeight="60.8" minHeight="10.0" prefHeight="33.60001220703125" vgrow="SOMETIMES" />
           <RowConstraints maxHeight="27.19998779296875" minHeight="0.0" prefHeight="27.19998779296875" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="27.19998779296875" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <VBox.margin>
             <Insets />
@@ -35,6 +36,12 @@
             <TextField fx:id="txtNombre" GridPane.columnIndex="1" />
             <Label prefHeight="18.0" prefWidth="231.0" text="Dominio:" GridPane.rowIndex="1" />
             <TextField fx:id="txtMaterno" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label layoutX="30.0" layoutY="44.0" prefHeight="18.0" prefWidth="231.0" text="Persona:" GridPane.rowIndex="2" />
+            <Button mnemonicParsing="false" onAction="#onActionBuscar" prefHeight="26.0" prefWidth="337.0" text="Buscar persona" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <GridPane.margin>
+                  <Insets left="130.0" />
+               </GridPane.margin>
+            </Button>
          </children>
       </GridPane>
       <HBox alignment="CENTER_RIGHT" prefHeight="90.0" prefWidth="567.0" spacing="20.0">

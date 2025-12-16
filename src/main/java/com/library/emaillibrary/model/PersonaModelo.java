@@ -10,7 +10,7 @@ public class PersonaModelo {
     private String apellidoPaterno;
     private String apellidoMaterno;
     private LocalDate fechaDeNacimiento;
-    private LocalDate fechaDeFin; // Nuevo campo según tu SQL
+    private LocalDate fechaDeFin;
     private List<DepartamentoModelo> departamentos = new ArrayList<>();
     private CorreoModelo correo;
 
