@@ -27,7 +27,7 @@ tasks.withType<JavaCompile> {
 
 application {
     mainModule.set("com.biblioteca.bibliotecadecorreos")
-    mainClass.set("com.biblioteca.bibliotecadecorreos.HelloApplication")
+    mainClass.set("com.library.emaillibrary.Launcher")
 }
 
 javafx {
