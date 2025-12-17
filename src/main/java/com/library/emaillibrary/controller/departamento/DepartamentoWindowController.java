@@ -101,7 +101,6 @@ public class DepartamentoWindowController implements Initializable {
         }
     }
 
-    // ... (Mantener métodos actionBuscar y realizarBusqueda que hicimos antes) ...
     public void realizarBusqueda(String nombre) {
         try {
             List<DepartamentoModelo> resultados = departamentoDAO.buscarPorNombre(nombre);
@@ -126,10 +125,110 @@ public class DepartamentoWindowController implements Initializable {
         } catch (IOException e) { e.printStackTrace(); }
     }
 
-    // ... (Mantener actionRegistrar, actionEditar, actionEliminar originales) ...
-    @FXML void actionRegistrar(ActionEvent event) { /* código original */ }
-    @FXML void actionEditar(ActionEvent event) { /* código original */ }
-    @FXML void actionEliminar(ActionEvent event) { /* código original con try-catch 2292 */ }
+    // -------------------------------------------------------------------------
+    // IMPLEMENTACIÓN DE LOS MÉTODOS SOLICITADOS
+    // -------------------------------------------------------------------------
+
+    @FXML
+    void actionRegistrar(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/library/emaillibrary/formulario-nuevo-departamento.fxml"));
+            Parent root = loader.load();
+
+            // Configurar el controlador si es necesario (ej. pasar referencia para refresh)
+            NuevoDepartamentoController controller = loader.getController();
+
+            Stage stage = new Stage();
+            stage.setTitle("Nuevo Departamento");
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(tblDepartamentos.getScene().getWindow());
+            stage.setScene(new Scene(root));
+
+            // Esperar a que se cierre para actualizar la tabla
+            stage.showAndWait();
+            cargarDatos();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo abrir el formulario de registro.", Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
+    void actionEditar(ActionEvent event) {
+        DepartamentoModelo seleccionado = tblDepartamentos.getSelectionModel().getSelectedItem();
+
+        if (seleccionado == null) {
+            mostrarAlerta("Advertencia", "Por favor, selecciona un departamento para editar.", Alert.AlertType.WARNING);
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/library/emaillibrary/formulario-nuevo-departamento.fxml"));
+            Parent root = loader.load();
+
+            // Obtener controlador y pasar los datos
+            NuevoDepartamentoController controller = loader.getController();
+            // Asegúrate que NuevoDepartamentoController tenga este método:
+            controller.initAttributes(seleccionado);
+
+            Stage stage = new Stage();
+            stage.setTitle("Editar Departamento");
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(tblDepartamentos.getScene().getWindow());
+            stage.setScene(new Scene(root));
+
+            stage.showAndWait();
+            cargarDatos();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudo abrir el formulario de edición.", Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
+    void actionEliminar(ActionEvent event) {
+        DepartamentoModelo seleccionado = tblDepartamentos.getSelectionModel().getSelectedItem();
+
+        if (seleccionado == null) {
+            mostrarAlerta("Advertencia", "Selecciona un departamento para eliminar.", Alert.AlertType.WARNING);
+            return;
+        }
+
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacion.setTitle("Confirmar eliminación");
+        confirmacion.setHeaderText(null);
+        confirmacion.setContentText("¿Estás seguro de eliminar el departamento: " + seleccionado.getNombre() + "?");
+
+        Optional<ButtonType> resultado = confirmacion.showAndWait();
+
+        if (resultado.isPresent() && resultado.get() == ButtonType.OK) {
+            try {
+                // Asumo que el método en tu DAO se llama 'delete'. Si se llama 'eliminar', ajústalo aquí.
+                departamentoDAO.eliminar(seleccionado.getIdDepartamento());
+                cargarDatos();
+                mostrarAlerta("Éxito", "Departamento eliminado correctamente.", Alert.AlertType.INFORMATION);
+
+            } catch (SQLException e) {
+                // CAPTURA ESPECÍFICA PARA ORACLE ORA-02292 (Integrity constraint violation)
+                if (e.getErrorCode() == 2292) {
+                    mostrarAlerta("No se puede eliminar",
+                            "Este departamento tiene PERSONAS asignadas.\n" +
+                                    "Primero debes eliminar o reasignar a todas las personas de este departamento.",
+                            Alert.AlertType.ERROR);
+                } else {
+                    e.printStackTrace();
+                    mostrarAlerta("Error de Base de Datos", "Error al eliminar: " + e.getMessage(), Alert.AlertType.ERROR);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                mostrarAlerta("Error", "Ocurrió un error inesperado al eliminar.", Alert.AlertType.ERROR);
+            }
+        }
+    }
+
+    // -------------------------------------------------------------------------
 
     private void cerrarVentana() {
         Stage stage = (Stage) tblDepartamentos.getScene().getWindow();
@@ -139,7 +238,8 @@ public class DepartamentoWindowController implements Initializable {
     private void mostrarAlerta(String titulo, String contenido, Alert.AlertType tipo) {
         Alert alert = new Alert(tipo);
         alert.setTitle(titulo);
+        alert.setHeaderText(null);
         alert.setContentText(contenido);
-        alert.show();
+        alert.showAndWait();
     }
 }
